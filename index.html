@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuclear Structural Solver: BS 8110 & BS 5950</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #e9ecef; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background: #0d1b2a; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #1abc9c; }
+        header h1 { font-size: 24px; } header p { font-size: 14px; color: #a0c4ff; }
+        .container { display: flex; flex: 1; flex-wrap: wrap; }
+        .sidebar { width: 100%; max-width: 280px; background: #1b263b; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .tab-btn { padding: 15px; background: transparent; color: white; border: none; text-align: left; font-size: 15px; cursor: pointer; border-radius: 5px; transition: 0.2s; font-weight: 600; }
+        .tab-btn:hover, .tab-btn.active { background: #1abc9c; color: #0d1b2a; }
+        .content { flex: 1; padding: 25px; min-width: 300px; }
+        .tab-content { display: none; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .input-grid label { display: flex; flex-direction: column; font-weight: 600; font-size: 13px; color: #2c3e50; }
+        .input-grid input, .input-grid select { margin-top: 5px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; background: #f8f9fa; transition: 0.2s; }
+        .input-grid input:focus, .input-grid select:focus { border-color: #1abc9c; outline: none; background: white; }
+        
+        .action-btn { background: #1abc9c; color: white; border: none; padding: 12px 30px; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; max-width: 250px; transition: 0.2s; }
+        .action-btn:hover { background: #16a085; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3); }
+        
+        .report-box { margin-top: 25px; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 6px solid #1abc9c; overflow-x: auto; }
+        .report-box h3 { color: #0d1b2a; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px; }
+        .report-box hr { border: 0; border-top: 1px dashed #dee2e6; margin: 15px 0; }
+        .step-title { font-weight: 700; color: #1b263b; font-size: 15px; display: block; margin-bottom: 4px; }
+        .step-body { color: #343a40; line-height: 1.6; font-family: 'Courier New', monospace; font-size: 14px; padding-left: 10px; }
+        .pass { color: #1abc9c; font-weight: bold; }
+        .fail { color: #e74c3c; font-weight: bold; }
+        @media (max-width: 600px) { .sidebar { max-width: 100%; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ Nuclear Structural Solver</h1>
+        <p>BS 8110 (Concrete) & BS 5950 (Steel) | Step-by-Step Reports</p>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <button class="tab-btn active" onclick="switchTab('concrete')">🧱 RC Beam (BS 8110)</button>
+            <button class="tab-btn" onclick="switchTab('steel')">⚙️ Steel Beam (BS 5950)</button>
+        </div>
+
+        <div class="content">
+            <!-- CONCRETE TAB -->
+            <div id="concrete-tab" class="tab-content active">
+                <h2>Reinforced Concrete Beam (BS 8110)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="c_span" value="6" step="0.1"></label>
+                    <label>Dead (kN/m): <input type="number" id="c_gk" value="25" step="0.1"></label>
+                    <label>Imposed (kN/m): <input type="number" id="c_qk" value="19" step="0.1"></label>
+                    <label>Width b (mm): <input type="number" id="c_b" value="300"></label>
+                    <label>Depth h (mm): <input type="number" id="c_h" value="600"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="c_fcu" value="30"></label>
+                    <label>f_y (N/mm²): <input type="number" id="c_fy" value="460"></label>
+                    <label>Cover (mm): <input type="number" id="c_cov" value="25"></label>
+                </div>
+                <button class="action-btn" onclick="solveConcrete()">Calculate RC Beam</button>
+                <div id="c_output" class="report-box"></div>
+            </div>
+
+            <!-- STEEL TAB -->
+            <div id="steel-tab" class="tab-content">
+                <h2>Steel Beam (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="s_span" value="10" step="0.1"></label>
+                    <label>Dead (kN/m): <input type="number" id="s_gk" value="5" step="0.1"></label>
+                    <label>Imposed (kN/m): <input type="number" id="s_qk" value="15" step="0.1"></label>
+                    <label>Steel Grade: <select id="s_grade"><option value="275">S275</option><option value="355" selected>S355</option><option value="460">S460</option></select></label>
+                    <label>Restrained: <select id="s_rest"><option value="yes">Fully Restrained</option><option value="no">Unrestrained (LTB)</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveSteel()">Calculate Steel Beam</button>
+                <div id="s_output" class="report-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- UI CONTROLLER ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+        function getSel(id) { return document.getElementById(id).value; }
+        function printReport(id, steps) {
+            let html = "<h3>📋 Step-by-Step Calculation Report</h3>";
+            steps.forEach(s => { html += `<hr><span class="step-title">${s.title}</span><div class="step-body">${s.body}</div>`; });
+            document.getElementById(id).innerHTML = html;
+        }
+
+        // --- CONCRETE ENGINE (BS 8110) ---
+        function solveConcrete() {
+            let L=getVal('c_span'), gk=getVal('c_gk'), qk=getVal('c_qk'), b=getVal('c_b'), h=getVal('c_h');
+            let fcu=getVal('c_fcu'), fy=getVal('c_fy'), cov=getVal('c_cov');
+            let steps = [];
+            let w = 1.4*gk + 1.6*qk;
+            steps.push({title: "1. Ultimate Load (Eq 3.2)", body: `w = 1.4(${gk}) + 1.6(${qk}) = <strong>${w.toFixed(2)} kN/m</strong>`});
+            let M = w * L * L / 8;
+            steps.push({title: "2. Design Moment", body: `M = wL²/8 = ${w.toFixed(2)}(${L})²/8 = <strong>${M.toFixed(2)} kNm</strong>`});
+            let d = h - cov - 8 - 10;
+            steps.push({title: "3. Effective Depth", body: `Assume 8mm links, 20mm bars. d = ${h} - ${cov} - 8 - 10 = <strong>${d} mm</strong>`});
+            let Mu = 0.156 * fcu * b * d * d / 1e6;
+            let K = M / (fcu * b * d * d * 1e-6);
+            steps.push({title: "4. Moment Resistance (Eq 3.11)", body: `Mu = 0.156 fcu b d² = ${Mu.toFixed(2)} kNm<br>K = M / fcu b d² = <strong>${K.toFixed(4)}</strong>`});
+            
+            let As = 0, z = 0;
+            if (K <= 0.156) {
+                z = d * (0.5 + Math.sqrt(0.25 - K/0.9)); if (z > 0.95*d) z = 0.95*d;
+                As = (M * 1e6) / (0.87 * fy * z);
+                steps.push({title: "5. Singly Reinforced (Eq 3.12, 3.13)", body: `K ≤ 0.156. Lever arm z = ${z.toFixed(1)} mm<br>As = M / (0.87 fy z) = <strong>${As.toFixed(0)} mm²</strong>`});
+            } else {
+                let d2 = cov + 8 + 10; let Kp = 0.156;
+                let z2 = d * (0.5 + Math.sqrt(0.25 - Kp/0.9));
+                let As2 = (M * 1e6 - Mu * 1e6) / (0.87 * fy * (d - d2));
+                let As1 = Mu * 1e6 / (0.87 * fy * z2); As = As1 + As2;
+                steps.push({title: "5. Doubly Reinforced", body: `K > 0.156. Compression steel needed.<br>As = <strong>${As.toFixed(0)} mm²</strong>`});
+            }
+            let V = w * L / 2; let v = V * 1000 / (b * d);
+            steps.push({title: "6. Shear Stress (Eq 3.14)", body: `V = ${V.toFixed(2)} kN<br>v = V/bd = <strong>${v.toFixed(2)} N/mm²</strong>`});
+            let vc = 0.6 * Math.pow(fcu/25, 1/3);
+            if (v > vc + 0.4) {
+                let sv = b * (v - vc) / (0.87 * 250);
+                steps.push({title: "7. Shear Links (Eq 3.15)", body: `v > vc+0.4. Design links: Asv/sv = <strong>${sv.toFixed(3)}</strong>`});
+            } else { steps.push({title: "7. Shear Links", body: `v < vc+0.4. Nominal links only.`}); }
+            printReport('c_output', steps);
+        }
+
+        // --- STEEL ENGINE (BS 5950) ---
+        const UBs = {
+            "610x229x101": {D:602.6,B:227.6,t:10.5,T:14.8,A:12900,ry:5.01,u:0.863,x:41.9,Sx:2880,Zx:2510},
+            "406x178x60":  {D:406.6,B:177.9,t:7.9,T:12.8,A:7580,ry:3.95,u:0.888,x:36.1,Sx:1190,Zx:1060},
+            "356x171x51":  {D:355.6,B:171.5,t:7.4,T:11.5,A:6480,ry:3.85,u:0.885,x:35.3,Sx:995,Zx:895},
+            "305x165x40":  {D:303.8,B:165.0,t:6.0,T:10.2,A:5150,ry:3.37,u:0.886,x:32.7,Sx:723,Zx:655}
+        };
+        function solveSteel() {
+            let L=getVal('s_span'), gk=getVal('s_gk'), qk=getVal('s_qk'), py=getVal('s_grade'), rest=getSel('s_rest');
+            let steps = [];
+            let w = 1.4*gk + 1.6*qk; let M = w*L*L/8; let V = w*L/2;
+            steps.push({title:"1. Loads & Moments", body:`w = ${w.toFixed(1)} kN/m<br>M = ${M.toFixed(1)} kNm | V = ${V.toFixed(1)} kN`});
+            let reqS = M * 1e6 / py; 
+            steps.push({title:"2. Selection (Eq 4.3)", body:`Required Sx ≥ ${reqS.toFixed(0)} mm³`});
+            let sec = null; for(let k in UBs){ if(UBs[k].Sx >= reqS){ sec=k; break; } }
+            if(!sec){ steps.push({title:"ERROR", body:"No section in database meets this moment."}); printReport('s_output', steps); return; }
+            let p = UBs[sec]; let eps = Math.sqrt(275/py);
+            steps.push({title:"3. Selected Section", body:`Choose <strong>${sec}</strong> UB<br>Sx = ${p.Sx} cm³, Zx = ${p.Zx} cm³`});
+            let bT = p.B/(2*p.T); let dt = p.D/p.t;
+            let classRes = (bT <= 9*eps && dt <= 80*eps) ? "Class 1 Plastic" : "Class 2 Compact";
+            steps.push({title:"4. Classification (Table 4.4)", body:`ε = ${eps.toFixed(3)}<br>b/T = ${bT.toFixed(2)}, d/t = ${dt.toFixed(2)}<br>Section is <strong>${classRes}</strong>`});
+            let Pv = 0.6 * py * p.D * p.t / 1000; // kN
+            steps.push({title:"5. Shear Capacity (Eq 4.5)", body:`Pv = 0.6 py D t = ${Pv.toFixed(1)} kN<br>Fv (${V.toFixed(1)}) ${V <= Pv ? '<span class="pass">≤</span>' : '<span class="fail">></span>'} Pv (${Pv.toFixed(1)}) -> ${V <= Pv ? 'OK' : 'FAIL'}`});
+            let Mc = py * p.Sx / 1000; let McLim = 1.2 * py * p.Zx / 1000; Mc = Math.min(Mc, McLim);
+            if(rest === 'no'){
+                let Le = L * 1000; let lambda = Le / (p.ry * 10); 
+                steps.push({title:"6. LTB (Unrestrained)", body:`Simplified LTB check (Eq 4.19):<br>λ = ${lambda.toFixed(1)}<br>Moment capacity = ${Mc.toFixed(1)} kNm`});
+            }
+            steps.push({title:"Final Check", body:`Design Moment (${M.toFixed(1)} kNm) ${M <= Mc ? '<span class="pass">≤</span>' : '<span class="fail">></span>'} Moment Capacity (${Mc.toFixed(1)} kNm) -> <strong>${M <= Mc ? 'SECTION IS ADEQUATE' : 'SECTION FAILS'}</strong>`});
+            printReport('s_output', steps);
+        }
+    </script>
+</body>
+</html>
