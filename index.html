@@ -3,51 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Structural Solver: BS 8110 & BS 5950</title>
+    <title>☢️ Nuclear Structural Solver</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>⚡ Nuclear Structural Solver</h1>
-        <p>BS 8110 (Concrete) & BS 5950 (Steel) | Step-by-Step Reports</p>
+        <h1>☢️ Nuclear Structural Solver</h1>
+        <p>BS 8110 • BS 5950 • Radiation Shielding • Containment Design</p>
     </header>
     <div class="container">
         <div class="sidebar">
-            <button class="tab-btn active" onclick="switchTab('concrete')">🧱 RC Beam (BS 8110)</button>
-            <button class="tab-btn" onclick="switchTab('steel')">⚙️ Steel Beam (BS 5950)</button>
+            <button class="tab-btn active" onclick="switchTab('concrete', event)">🧱 RC Beam</button>
+            <button class="tab-btn" onclick="switchTab('steel', event)">⚙️ Steel Beam</button>
+            <button class="tab-btn" onclick="switchTab('shield', event)">☢️ Shielding</button>
+            <button class="tab-btn" onclick="switchTab('containment', event)">🏭 Containment</button>
+            <button class="tab-btn" onclick="switchTab('blast', event)">💥 Blast Wall</button>
         </div>
         <div class="content">
             <div id="concrete-tab" class="tab-content active">
-                <h2>Reinforced Concrete Beam (BS 8110)</h2>
+                <h2>🧱 Nuclear RC Beam (BS 8110)</h2>
                 <div class="input-grid">
-                    <label>Span (m): <input type="number" id="c_span" value="6" step="0.1"></label>
-                    <label>Dead (kN/m): <input type="number" id="c_gk" value="25" step="0.1"></label>
-                    <label>Imposed (kN/m): <input type="number" id="c_qk" value="19" step="0.1"></label>
+                    <label>Span (m): <input type="number" id="c_span" value="6"></label>
+                    <label>Dead Load (kN/m): <input type="number" id="c_gk" value="25"></label>
+                    <label>Live Load (kN/m): <input type="number" id="c_qk" value="19"></label>
                     <label>Width b (mm): <input type="number" id="c_b" value="300"></label>
                     <label>Depth h (mm): <input type="number" id="c_h" value="600"></label>
-                    <label>f_cu (N/mm²): <input type="number" id="c_fcu" value="30"></label>
-                    <label>f_y (N/mm²): <input type="number" id="c_fy" value="460"></label>
-                    <label>Cover (mm): <input type="number" id="c_cov" value="25"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="c_fcu" value="40"></label>
+                    <label>f_y (N/mm²): <input type="number" id="c_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="c_cov" value="50"></label>
                 </div>
-                <button class="action-btn" onclick="solveConcrete()">Calculate RC Beam</button>
+                <button class="action-btn" onclick="solveConcrete()">⚡ Calculate Nuclear RC Beam</button>
                 <div id="c_output" class="report-box"></div>
             </div>
             <div id="steel-tab" class="tab-content">
-                <h2>Steel Beam (BS 5950)</h2>
+                <h2>⚙️ Nuclear Steel Beam (BS 5950)</h2>
                 <div class="input-grid">
-                    <label>Span (m): <input type="number" id="s_span" value="10" step="0.1"></label>
-                    <label>Dead (kN/m): <input type="number" id="s_gk" value="5" step="0.1"></label>
-                    <label>Imposed (kN/m): <input type="number" id="s_qk" value="15" step="0.1"></label>
+                    <label>Span (m): <input type="number" id="s_span" value="10"></label>
+                    <label>Dead Load (kN/m): <input type="number" id="s_gk" value="5"></label>
+                    <label>Live Load (kN/m): <input type="number" id="s_qk" value="15"></label>
                     <label>Steel Grade: <select id="s_grade"><option value="275">S275</option><option value="355" selected>S355</option><option value="460">S460</option></select></label>
-                    <label>Restrained: <select id="s_rest"><option value="yes">Fully Restrained</option><option value="no">Unrestrained (LTB)</option></select></label>
+                    <label>Restrained: <select id="s_rest"><option value="yes">Fully Restrained</option><option value="no">Unrestrained</option></select></label>
                 </div>
-                <button class="action-btn" onclick="solveSteel()">Calculate Steel Beam</button>
+                <button class="action-btn" onclick="solveSteel()">⚙️ Calculate Nuclear Steel Beam</button>
                 <div id="s_output" class="report-box"></div>
+            </div>
+            <div id="shield-tab" class="tab-content">
+                <h2>☢️ Radiation Shielding Design</h2>
+                <div class="input-grid">
+                    <label>Source Activity (GBq): <input type="number" id="sh_activity" value="1000"></label>
+                    <label>Distance (m): <input type="number" id="sh_distance" value="5"></label>
+                    <label>Max Allowable Dose (μSv/h): <input type="number" id="sh_limit" value="0.5"></label>
+                    <label>Material: <select id="sh_material"><option value="concrete">Concrete (2.35 g/cm³)</option><option value="lead">Lead (11.34 g/cm³)</option><option value="steel">Steel (7.85 g/cm³)</option></select></label>
+                    <label>Energy (MeV): <input type="number" id="sh_energy" value="1.0" step="0.1"></label>
+                </div>
+                <button class="action-btn" onclick="solveShielding()">☢️ Calculate Shielding</button>
+                <div id="sh_output" class="report-box"></div>
+            </div>
+            <div id="containment-tab" class="tab-content">
+                <h2>🏭 Containment Vessel Design</h2>
+                <div class="input-grid">
+                    <label>Internal Pressure (MPa): <input type="number" id="cn_pressure" value="1.5" step="0.1"></label>
+                    <label>Inner Radius (m): <input type="number" id="cn_radius" value="10"></label>
+                    <label>Design Temp (°C): <input type="number" id="cn_temp" value="300"></label>
+                    <label>Steel Grade: <select id="cn_grade"><option value="275">S275</option><option value="355" selected>S355</option></select></label>
+                    <label>Corrosion Allowance (mm): <input type="number" id="cn_corr" value="3"></label>
+                </div>
+                <button class="action-btn" onclick="solveContainment()">🏭 Design Containment Vessel</button>
+                <div id="cn_output" class="report-box"></div>
+            </div>
+            <div id="blast-tab" class="tab-content">
+                <h2>💥 Blast-Resistant Wall (BS 8110)</h2>
+                <div class="input-grid">
+                    <label>Explosive Mass (kg TNT): <input type="number" id="bl_mass" value="500"></label>
+                    <label>Standoff Distance (m): <input type="number" id="bl_distance" value="20"></label>
+                    <label>Wall Height (m): <input type="number" id="bl_height" value="4"></label>
+                    <label>Wall Length (m): <input type="number" id="bl_length" value="6"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="bl_fcu" value="50"></label>
+                </div>
+                <button class="action-btn" onclick="solveBlast()">💥 Design Blast Wall</button>
+                <div id="bl_output" class="report-box"></div>
             </div>
         </div>
     </div>
     <script src="app.js"></script>
     <script src="bs8110_concrete.js"></script>
     <script src="bs5950_steel.js"></script>
+    <script src="shielding.js"></script>
+    <script src="containment.js"></script>
+    <script src="blast.js"></script>
 </body>
 </html>
