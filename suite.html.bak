@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Engineering Suite | BS 8110 & BS 5950</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        body{background:#e9ecef;display:flex;flex-direction:column;min-height:100vh;color:#212529}
+        header{background:#1b263b;padding:20px;text-align:center;border-bottom:4px solid #1abc9c}
+        header h1{font-size:24px;color:#fff}
+        header p{font-size:14px;color:#a0c4ff;margin-top:5px}
+        .container{display:flex;flex:1;flex-wrap:wrap}
+        .sidebar{width:100%;max-width:260px;background:#1b263b;padding:20px;display:flex;flex-direction:column;gap:8px}
+        .tab-btn{padding:14px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.15);text-align:left;font-size:14px;cursor:pointer;border-radius:8px;transition:0.3s;font-weight:600}
+        .tab-btn:hover,.tab-btn.active{background:#1abc9c;color:#fff;border-color:#1abc9c}
+        .content{flex:1;padding:25px;min-width:300px}
+        .tab-content{display:none;animation:fadeIn 0.4s}
+        .tab-content.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .input-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:20px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+        .input-grid label{display:flex;flex-direction:column;font-weight:600;font-size:13px;color:#2c3e50}
+        .input-grid input,.input-grid select{margin-top:5px;padding:10px 14px;border:1px solid #ced4da;border-radius:6px;font-size:14px;background:#f8f9fa;transition:0.2s}
+        .input-grid input:focus,.input-grid select:focus{border-color:#1abc9c;outline:none;background:#fff}
+        .action-btn{background:#1abc9c;color:#fff;border:none;padding:14px 30px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;width:100%;max-width:300px;transition:0.3s}
+        .action-btn:hover{background:#16a085;transform:translateY(-2px);box-shadow:0 4px 12px rgba(26,188,156,0.3)}
+        .report-box{margin-top:25px;background:#fff;padding:25px;border-radius:10px;border-left:6px solid #1abc9c;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow-x:auto}
+        .report-box h3{color:#1b263b;border-bottom:2px solid #e9ecef;padding-bottom:12px;margin-bottom:15px;font-size:18px}
+        .report-box hr{border:0;border-top:1px dashed #dee2e6;margin:15px 0}
+        .step-title{font-weight:700;color:#1b263b;font-size:15px;display:block;margin-bottom:6px}
+        .step-body{color:#495057;line-height:1.7;font-family:'Courier New',monospace;font-size:14px;padding-left:10px}
+        .pass{color:#1abc9c;font-weight:bold}
+        .fail{color:#e74c3c;font-weight:bold}
+        h2{color:#1b263b;margin-bottom:20px;font-size:22px;border-bottom:2px solid #e9ecef;padding-bottom:10px}
+        @media(max-width:600px){.sidebar{max-width:100%}.input-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Structural Engineering Suite</h1>
+        <p>BS 8110-1:1997 • BS 5950-1:2000 | Beams • Slabs • Columns • Footings • Walls • Steel</p>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <button class="tab-btn active" onclick="switchTab('rcbeam', event)">RC Beam</button>
+            <button class="tab-btn" onclick="switchTab('rcslab', event)">RC Slab</button>
+            <button class="tab-btn" onclick="switchTab('rccolumn', event)">RC Column</button>
+            <button class="tab-btn" onclick="switchTab('rcfooting', event)">Pad Footing</button>
+            <button class="tab-btn" onclick="switchTab('rcwall', event)">Retaining Wall</button>
+            <button class="tab-btn" onclick="switchTab('steelbeam', event)">Steel Beam</button>
+            <button class="tab-btn" onclick="switchTab('steelcol', event)">Steel Column</button>
+        </div>
+        <div class="content">
+            <div id="rcbeam-tab" class="tab-content active">
+                <h2>RC Beam Design (BS 8110)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="c_span" value="6" step="0.1"></label>
+                    <label>Dead Load (kN/m): <input type="number" id="c_gk" value="25" step="0.1"></label>
+                    <label>Live Load (kN/m): <input type="number" id="c_qk" value="19" step="0.1"></label>
+                    <label>Width b (mm): <input type="number" id="c_b" value="300"></label>
+                    <label>Depth h (mm): <input type="number" id="c_h" value="600"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="c_fcu" value="30"></label>
+                    <label>f_y (N/mm²): <input type="number" id="c_fy" value="460"></label>
+                    <label>Cover (mm): <input type="number" id="c_cov" value="25"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCBeam()">Calculate Beam</button>
+                <div id="c_output" class="report-box"></div>
+            </div>
+            <div id="rcslab-tab" class="tab-content">
+                <h2>One-Way Slab Design</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="s_span" value="4.25" step="0.1"></label>
+                    <label>Dead Load (kN/m²): <input type="number" id="s_gk" value="4.5" step="0.1"></label>
+                    <label>Live Load (kN/m²): <input type="number" id="s_qk" value="4" step="0.1"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="s_fcu" value="35"></label>
+                    <label>f_y (N/mm²): <input type="number" id="s_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="s_cov" value="25"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCSlab()">Calculate Slab</button>
+                <div id="s_output" class="report-box"></div>
+            </div>
+            <div id="rccolumn-tab" class="tab-content">
+                <h2>Short Braced Column</h2>
+                <div class="input-grid">
+                    <label>Axial Load N (kN): <input type="number" id="col_N" value="3000"></label>
+                    <label>Moment Mx (kNm): <input type="number" id="col_Mx" value="100"></label>
+                    <label>Moment My (kNm): <input type="number" id="col_My" value="20"></label>
+                    <label>Width b (mm): <input type="number" id="col_b" value="350"></label>
+                    <label>Depth h (mm): <input type="number" id="col_h" value="350"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="col_fcu" value="40"></label>
+                    <label>f_y (N/mm²): <input type="number" id="col_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="col_cov" value="35"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCColumn()">Calculate Column</button>
+                <div id="col_output" class="report-box"></div>
+            </div>
+            <div id="rcfooting-tab" class="tab-content">
+                <h2>Pad Footing Design</h2>
+                <div class="input-grid">
+                    <label>Column Load N (kN): <input type="number" id="f_N" value="3000"></label>
+                    <label>Column Width (mm): <input type="number" id="f_cb" value="400"></label>
+                    <label>Column Depth (mm): <input type="number" id="f_ch" value="400"></label>
+                    <label>Bearing Capacity (kN/m²): <input type="number" id="f_bear" value="170"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="f_fcu" value="35"></label>
+                    <label>f_y (N/mm²): <input type="number" id="f_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="f_cov" value="50"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCFooting()">Calculate Footing</button>
+                <div id="f_output" class="report-box"></div>
+            </div>
+            <div id="rcwall-tab" class="tab-content">
+                <h2>Cantilever Retaining Wall</h2>
+                <div class="input-grid">
+                    <label>Wall Height H (m): <input type="number" id="w_H" value="5.4" step="0.1"></label>
+                    <label>Soil Density γ (kN/m³): <input type="number" id="w_g" value="19"></label>
+                    <label>Friction Angle φ (°): <input type="number" id="w_phi" value="30"></label>
+                    <label>Base Friction μ: <input type="number" id="w_mu" value="0.4" step="0.1"></label>
+                    <label>Allowable Bearing (kN/m²): <input type="number" id="w_bear" value="120"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="f_fcu" value="35"></label>
+                    <label>f_y (N/mm²): <input type="number" id="f_fy" value="500"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCWall()">Calculate Wall</button>
+                <div id="w_output" class="report-box"></div>
+            </div>
+            <div id="steelbeam-tab" class="tab-content">
+                <h2>Steel Beam (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="sb_span" value="10" step="0.1"></label>
+                    <label>Dead Load (kN/m): <input type="number" id="sb_gk" value="5" step="0.1"></label>
+                    <label>Live Load (kN/m): <input type="number" id="sb_qk" value="15" step="0.1"></label>
+                    <label>Steel Grade: <select id="sb_grade"><option value="275">S275</option><option value="355" selected>S355</option><option value="460">S460</option></select></label>
+                    <label>Restraint: <select id="sb_rest"><option value="yes">Fully Restrained</option><option value="no">Unrestrained (LTB)</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveSteelBeam()">Calculate Steel Beam</button>
+                <div id="sb_output" class="report-box"></div>
+            </div>
+            <div id="steelcol-tab" class="tab-content">
+                <h2>Steel Column (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Axial Load N (kN): <input type="number" id="sc_N" value="3000"></label>
+                    <label>Column Height (m): <input type="number" id="sc_L" value="5"></label>
+                    <label>Effective Length k: <select id="sc_k"><option value="0.7">0.7</option><option value="1.0" selected>1.0</option><option value="1.2">1.2</option><option value="2.0">2.0</option></select></label>
+                    <label>Steel Grade: <select id="sc_grade"><option value="275">S275</option><option value="355" selected>S355</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveSteelColumn()">Calculate Steel Column</button>
+                <div id="sc_output" class="report-box"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function switchTab(tabId, e) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId + '-tab').classList.add('active');
+            if (e) e.target.classList.add('active');
+        }
+        function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+        function getSel(id) { return document.getElementById(id).value; }
+        function printReport(id, steps) {
+            let html = "<h3>Design Report</h3>";
+            steps.forEach(s => { html += `<hr><span class="step-title">${s.title}</span><div class="step-body">${s.body}</div>`; });
+            document.getElementById(id).innerHTML = html;
+        }
+
+        function solveRCBeam() {
+            let L = getVal('c_span'), gk = getVal('c_gk'), qk = getVal('c_qk');
+            let b = getVal('c_b'), h = getVal('c_h'), fcu = getVal('c_fcu');
+            let fy = getVal('c_fy'), cov = getVal('c_cov');
+            let steps = [];
+            let w = 1.4 * gk + 1.6 * qk;
+            steps.push({ title: "1. Ultimate Load (Eq 3.2)", body: `w = 1.4Gk + 1.6Qk = <strong>${w.toFixed(2)} kN/m</strong>` });
+            let M = w * L * L / 8;
+            steps.push({ title: "2. Design Moment", body: `M = wL²/8 = <strong>${M.toFixed(2)} kNm</strong>` });
+            let d = h - cov - 8 - 10;
+            steps.push({ title: "3. Effective Depth", body: `d = ${h} - ${cov} - 8 - 10 = <strong>${d} mm</strong>` });
+            let K = M / (fcu * b * d * d * 1e-6);
+            let Mu = 0.156 * fcu * b * d * d / 1e6;
+            steps.push({ title: "4. K-Value (Cl 3.4.4.4)", body: `K = <strong>${K.toFixed(4)}</strong> | Mu = ${Mu.toFixed(1)} kNm<br>${K <= 0.156 ? '<span class="pass">Singly reinforced</span>' : '<span class="fail">Compression steel needed</span>'}` });
+            let As, z;
+            if (K <= 0.156) {
+                z = d * (0.5 + Math.sqrt(0.25 - K / 0.9)); if (z > 0.95 * d) z = 0.95 * d;
+                As = M * 1e6 / (0.87 * fy * z);
+                steps.push({ title: "5. Reinforcement (Eq 8)", body: `z = ${z.toFixed(1)} mm<br>As = <strong>${As.toFixed(0)} mm²</strong> (${Math.ceil(As / 314)}T20 bars)` });
+            } else {
+                let d2 = cov + 8 + 10, z2 = d * (0.5 + Math.sqrt(0.25 - 0.156 / 0.9));
+                let As1 = Mu * 1e6 / (0.87 * fy * z2), As2 = (M * 1e6 - Mu * 1e6) / (0.87 * fy * (d - d2));
+                As = As1 + As2;
+                steps.push({ title: "5. Doubly Reinforced", body: `As = <strong>${As.toFixed(0)} mm²</strong><br>Compression: ${As2.toFixed(0)} mm²` });
+            }
+            let V = w * L / 2, v = V * 1000 / (b * d);
+            let rho = Math.min(Math.max(As / (b * d), 0.002), 0.04);
+            let vc = 0.79 * Math.pow(100 * rho, 1 / 3) * Math.pow(400 / d, 0.25) * Math.pow(fcu / 25, 1 / 3) / 1.25;
+            steps.push({ title: "6. Shear Check", body: `v = ${v.toFixed(2)} N/mm² | vc = ${vc.toFixed(2)} N/mm²<br>${v <= vc ? '<span class="pass">Shear OK</span>' : '<span class="fail">Links required</span>'}` });
+            steps.push({ title: "Summary", body: `Beam: ${b}×${h}mm | As: <strong>${As.toFixed(0)} mm²</strong> | Cover: ${cov}mm` });
+            printReport('c_output', steps);
+        }
+
+        function solveRCSlab() {
+            let L = getVal('s_span'), gk = getVal('s_gk'), qk = getVal('s_qk');
+            let fcu = getVal('s_fcu'), fy = getVal('s_fy'), cov = getVal('s_cov');
+            let steps = [];
+            let w = 1.4 * gk + 1.6 * qk;
+            steps.push({ title: "1. Load", body: `w = <strong>${w.toFixed(2)} kN/m²</strong>` });
+            let M = w * L * L / 8;
+            let h = Math.ceil(L * 1000 / 20 / 10) * 10;
+            let d = h - cov - 5;
+            let K = M / (fcu * 1000 * d * d * 1e-6);
+            if (K > 0.156) { h += 20; d = h - cov - 5; K = M / (fcu * 1000 * d * d * 1e-6); }
+            let z = d * (0.5 + Math.sqrt(0.25 - K / 0.9)); if (z > 0.95 * d) z = 0.95 * d;
+            let As = Math.max(M * 1e6 / (0.87 * fy * z), 0.0013 * 1000 * h);
+            let sp = Math.floor(1000 / (As / 113));
+            steps.push({ title: "2. Design", body: `h = <strong>${h}mm</strong> | As = <strong>${As.toFixed(0)} mm²/m</strong><br>T12 @ ${Math.min(sp, 300)}mm c/c` });
+            printReport('s_output', steps);
+        }
+
+        function solveRCColumn() {
+            let N = getVal('col_N'), Mx = getVal('col_Mx'), My = getVal('col_My');
+            let b = getVal('col_b'), h = getVal('col_h'), fcu = getVal('col_fcu');
+            let fy = getVal('col_fy');
+            let steps = [];
+            let Ac = b * h;
+            let Ncap = (0.4 * fcu * Ac + 0.67 * fy * 0.01 * Ac) / 1000;
+            let ratio = N / Ncap;
+            let beta = 0.65;
+            let M_eff = Math.max(Mx, My) + beta * Math.min(Mx, My) * (Math.min(b, h) / Math.max(b, h));
+            let Asc = N * 1000 / (0.67 * fy);
+            steps.push({ title: "1. Axial", body: `Ncap = <strong>${Ncap.toFixed(0)} kN</strong> | Ratio = ${ratio.toFixed(2)}` });
+            steps.push({ title: "2. Biaxial", body: `M_eff = <strong>${M_eff.toFixed(1)} kNm</strong>` });
+            steps.push({ title: "3. Steel", body: `${Math.ceil(Asc / 314)}T20 bars | Links T8@300` });
+            printReport('col_output', steps);
+        }
+
+        function solveRCFooting() {
+            let N = getVal('f_N'), cb = getVal('f_cb'), ch = getVal('f_ch');
+            let qa = getVal('f_bear'), fcu = getVal('f_fcu'), fy = getVal('f_fy'), cov = getVal('f_cov');
+            let steps = [];
+            let size = Math.ceil(Math.sqrt(N / qa) * 10) / 10;
+            let h = 600, d = h - cov - 20 - 10;
+            let press = N / (size * size);
+            let crit = (size * 1000 - cb) / 2;
+            let M = press * crit * crit / 2 * 1000;
+            let As = Math.max(M / (0.87 * fy * 0.95 * d), 0.0015 * 1000 * h);
+            let Vp = N * 1.15 - press * (cb + 3 * d) * (ch + 3 * d) / 1e6;
+            let vp = Vp * 1000 / (2 * (cb + ch + 6 * d) * d);
+            steps.push({ title: "1. Size", body: `<strong>${size}×${size}m</strong> | Depth: 600mm` });
+            steps.push({ title: "2. Steel", body: `As = <strong>${As.toFixed(0)} mm²/m</strong> | T20@200 EW` });
+            steps.push({ title: "3. Punching", body: `v = ${vp.toFixed(2)} N/mm² ${vp <= 0.8 * Math.sqrt(fcu) ? '<span class="pass">OK</span>' : '<span class="fail">FAIL</span>'}` });
+            printReport('f_output', steps);
+        }
+
+        function solveRCWall() {
+            let H = getVal('w_H'), g = getVal('w_g'), phi = getVal('w_phi'), mu = getVal('w_mu');
+            let qa = getVal('w_bear'), fy = getVal('w_fy');
+            let steps = [];
+            let ka = (1 - Math.sin(phi * Math.PI / 180)) / (1 + Math.sin(phi * Math.PI / 180));
+            let Pa = 0.5 * ka * g * H * H;
+            let B = 0.6 * H, T = 0.1 * H;
+            let W = 24 * H * T + 24 * B * 0.5 + 18 * (B - T) * H;
+            let FoS_s = mu * W / (1.4 * Pa);
+            let Mo = 1.4 * Pa * H / 3;
+            let Mr = (24 * H * T + 24 * B * 0.5) * B / 2 + 18 * (B - T) * H * (B + (B - T) / 2);
+            let M_stem = 1.4 * Pa * H / 3;
+            let d_s = T * 1000 - 50 - 8 - 10;
+            let As = M_stem * 1e6 / (0.87 * fy * 0.95 * d_s);
+            steps.push({ title: "1. Earth Pressure", body: `ka = ${ka.toFixed(3)} | Pa = <strong>${Pa.toFixed(1)} kN/m</strong>` });
+            steps.push({ title: "2. Stability", body: `Sliding FoS = ${FoS_s.toFixed(2)} ${FoS_s >= 1.5 ? '<span class="pass">✓</span>' : '<span class="fail">✗</span>'}<br>Overturning FoS = ${(Mr / Mo).toFixed(2)} ${Mr / Mo >= 2 ? '<span class="pass">✓</span>' : '<span class="fail">✗</span>'}` });
+            steps.push({ title: "3. Stem", body: `Base: ${B.toFixed(2)}m | Stem: ${T.toFixed(2)}m<br>As = <strong>${As.toFixed(0)} mm²/m</strong>` });
+            printReport('w_output', steps);
+        }
+
+        const UBs = { "610x229x101": { D: 602.6, t: 10.5, Sx: 2880, Zx: 2510, ry: 5.01, u: 0.863, x: 41.9 }, "406x178x60": { D: 406.6, t: 7.9, Sx: 1190, Zx: 1060, ry: 3.95, u: 0.888, x: 36.1 }, "356x171x51": { D: 355.6, t: 7.4, Sx: 995, Zx: 895, ry: 3.85, u: 0.885, x: 35.3 }, "305x165x40": { D: 303.8, t: 6, Sx: 723, Zx: 655, ry: 3.37, u: 0.886, x: 32.7 } };
+        function solveSteelBeam() {
+            let L = getVal('sb_span'), gk = getVal('sb_gk'), qk = getVal('sb_qk');
+            let py = parseFloat(getSel('sb_grade')), rest = getSel('sb_rest');
+            let steps = [];
+            let w = 1.4 * gk + 1.6 * qk, M = w * L * L / 8, V = w * L / 2;
+            steps.push({ title: "1. Loads", body: `M = <strong>${M.toFixed(1)} kNm</strong> | V = <strong>${V.toFixed(1)} kN</strong>` });
+            let reqS = M * 1e6 / py;
+            let sec = null; for (let k in UBs) { if (UBs[k].Sx * 1000 >= reqS) { sec = k; break; } }
+            if (!sec) { steps.push({ title: "Error", body: "No section found" }); printReport('sb_output', steps); return; }
+            let p = UBs[sec];
+            steps.push({ title: "2. Section", body: `<strong>${sec} UB</strong> (Sx=${p.Sx} cm³)` });
+            let Pv = 0.6 * py * p.D * p.t / 1000;
+            let Mc = Math.min(py * p.Sx * 1000 / 1e6, 1.2 * py * p.Zx * 1000 / 1e6);
+            if (rest === 'no') {
+                let Le = L * 1000, lambda = Le / (p.ry * 10), lambdaLT = p.u * p.x * lambda;
+                let pb = lambdaLT <= 20 ? py : lambdaLT <= 40 ? py * 0.85 : lambdaLT <= 60 ? py * 0.58 : py * 0.45;
+                Mc = pb * p.Sx * 1000 / 1e6;
+                steps.push({ title: "3. LTB", body: `λLT = ${lambdaLT.toFixed(0)} | pb ≈ ${pb} N/mm² | Mb = ${Mc.toFixed(1)} kNm` });
+            }
+            steps.push({ title: "4. Check", body: `Shear: ${V <= Pv ? '<span class="pass">OK</span>' : '<span class="fail">FAIL</span>'}<br>Moment: ${M <= Mc ? '<span class="pass">OK</span>' : '<span class="fail">FAIL</span>'} (${(M / Mc * 100).toFixed(0)}%)` });
+            printReport('sb_output', steps);
+        }
+
+        const UCs = { "305x305x118": { A: 15000, ry: 7.75 }, "203x203x52": { A: 6650, ry: 5.16 }, "152x152x30": { A: 3830, ry: 3.82 } };
+        function solveSteelColumn() {
+            let N = getVal('sc_N'), L = getVal('sc_L'), k = parseFloat(getSel('sc_k')), py = parseFloat(getSel('sc_grade'));
+            let steps = [];
+            let Le = L * k * 1000;
+            let sec = "203x203x52", p = UCs[sec];
+            let lambda = Le / (p.ry * 10);
+            let pc = lambda <= 15 ? py : lambda <= 50 ? py * (1 - 0.003 * (lambda - 15)) : Math.max(py * (0.9 - 0.008 * (lambda - 50)), 50);
+            let Pc = p.A * pc / 1000;
+            steps.push({ title: "1. Effective Length", body: `Le = ${k}×${L} = <strong>${(Le / 1000).toFixed(2)}m</strong>` });
+            steps.push({ title: "2. Slenderness", body: `λ = <strong>${lambda.toFixed(1)}</strong> | pc ≈ ${pc.toFixed(0)} N/mm²` });
+            steps.push({ title: "3. Capacity", body: `Pc = <strong>${Pc.toFixed(0)} kN</strong> | N = ${N} kN<br>${N <= Pc ? '<span class="pass">OK</span>' : '<span class="fail">FAIL</span>'} (${(N / Pc * 100).toFixed(0)}%)` });
+            printReport('sc_output', steps);
+        }
+    </script>
+</body>
+</html>

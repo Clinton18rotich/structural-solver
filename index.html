@@ -7,10 +7,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header><h1>Full Structural Suite</h1><p>Analysis • BS 8110 • BS 5950 | 100% of Notes</p></header>
+    <header><h1>Full Structural Suite</h1><p>Analysis • Mechanics • BS 8110 & BS 5950 | 100% of Notes</p></header>
     <div class="container">
         <div class="sidebar">
             <button class="tab-btn active" onclick="switchTab('analysis')">📊 Structural Analysis</button>
+            <button class="tab-btn" onclick="switchTab('loaddown')">📐 Load Take-Down</button>
+            <button class="tab-btn" onclick="switchTab('superposition')">⚖️ Superposition Solver</button>
+            <button class="tab-btn" onclick="switchTab('mechanics')">🧪 Elastic vs Plastic</button>
             <button class="tab-btn" onclick="switchTab('rcbeam')">🧱 RC Beam</button>
             <button class="tab-btn" onclick="switchTab('rccontbeam')">📏 RC Continuous Beam</button>
             <button class="tab-btn" onclick="switchTab('rcslab')">📐 RC Slab</button>
@@ -26,6 +29,9 @@
         </div>
         <div class="content">
             <div id="analysis-tab" class="tab-content active"></div>
+            <div id="loaddown-tab" class="tab-content"></div>
+            <div id="superposition-tab" class="tab-content"></div>
+            <div id="mechanics-tab" class="tab-content"></div>
             <div id="rcbeam-tab" class="tab-content"></div>
             <div id="rccontbeam-tab" class="tab-content"></div>
             <div id="rcslab-tab" class="tab-content"></div>
@@ -41,8 +47,9 @@
         </div>
     </div>
     <script src="app.js"></script>
-    <script src="analysis_engine.js"></script>
     <script src="tables.js"></script>
+    <script src="analysis_engine.js"></script>
+    <script src="mechanics_engine.js"></script>
     <script src="concrete_engine.js"></script>
     <script src="steel_engine.js"></script>
 </body>
