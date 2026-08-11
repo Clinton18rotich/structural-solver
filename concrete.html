@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧱 BS 8110 Concrete Design Suite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🧱 BS 8110: Structural Concrete</h1>
+        <p>Beams • Slabs • Columns • Footings • Retaining Walls</p>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <button class="tab-btn active" onclick="switchTab('beam', event)">📐 RC Beam</button>
+            <button class="tab-btn" onclick="switchTab('slab', event)">📏 RC Slab</button>
+            <button class="tab-btn" onclick="switchTab('column', event)">🏛️ RC Column</button>
+            <button class="tab-btn" onclick="switchTab('footing', event)">🟫 Pad Footing</button>
+            <button class="tab-btn" onclick="switchTab('wall', event)">🧱 Retaining Wall</button>
+        </div>
+        <div class="content">
+            <div id="beam-tab" class="tab-content active">
+                <h2>📐 RC Beam Design (BS 8110-1:1997)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="c_span" value="6" step="0.1"></label>
+                    <label>Dead Load (kN/m): <input type="number" id="c_gk" value="25" step="0.1"></label>
+                    <label>Live Load (kN/m): <input type="number" id="c_qk" value="19" step="0.1"></label>
+                    <label>Width b (mm): <input type="number" id="c_b" value="300"></label>
+                    <label>Depth h (mm): <input type="number" id="c_h" value="600"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="c_fcu" value="40"></label>
+                    <label>f_y (N/mm²): <input type="number" id="c_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="c_cov" value="50"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCBeam()">Calculate Beam</button>
+                <div id="c_output" class="report-box"></div>
+            </div>
+            <div id="slab-tab" class="tab-content">
+                <h2>📏 One-Way Slab Design</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="s_span" value="4" step="0.1"></label>
+                    <label>Dead Load (kN/m²): <input type="number" id="s_gk" value="5" step="0.1"></label>
+                    <label>Live Load (kN/m²): <input type="number" id="s_qk" value="3" step="0.1"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="s_fcu" value="30"></label>
+                    <label>f_y (N/mm²): <input type="number" id="s_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="s_cov" value="25"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCSlab()">Calculate Slab</button>
+                <div id="s_output" class="report-box"></div>
+            </div>
+            <div id="column-tab" class="tab-content">
+                <h2>🏛️ Short Braced Column</h2>
+                <div class="input-grid">
+                    <label>Axial Load N (kN): <input type="number" id="col_N" value="1500"></label>
+                    <label>Moment Mx (kNm): <input type="number" id="col_Mx" value="50"></label>
+                    <label>Moment My (kNm): <input type="number" id="col_My" value="30"></label>
+                    <label>Width b (mm): <input type="number" id="col_b" value="300"></label>
+                    <label>Depth h (mm): <input type="number" id="col_h" value="450"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="col_fcu" value="40"></label>
+                    <label>f_y (N/mm²): <input type="number" id="col_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="col_cov" value="35"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCColumn()">Calculate Column</button>
+                <div id="col_output" class="report-box"></div>
+            </div>
+            <div id="footing-tab" class="tab-content">
+                <h2>🟫 Pad Footing Design</h2>
+                <div class="input-grid">
+                    <label>Column Load N (kN): <input type="number" id="f_N" value="1200"></label>
+                    <label>Column Width (mm): <input type="number" id="f_cb" value="300"></label>
+                    <label>Column Depth (mm): <input type="number" id="f_ch" value="300"></label>
+                    <label>Bearing Capacity (kN/m²): <input type="number" id="f_bear" value="200"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="f_fcu" value="35"></label>
+                    <label>f_y (N/mm²): <input type="number" id="f_fy" value="500"></label>
+                    <label>Cover (mm): <input type="number" id="f_cov" value="75"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCFooting()">Calculate Footing</button>
+                <div id="f_output" class="report-box"></div>
+            </div>
+            <div id="wall-tab" class="tab-content">
+                <h2>🧱 Cantilever Retaining Wall</h2>
+                <div class="input-grid">
+                    <label>Wall Height H (m): <input type="number" id="w_H" value="3"></label>
+                    <label>Soil Density γ (kN/m³): <input type="number" id="w_g" value="18"></label>
+                    <label>Friction Angle φ (°): <input type="number" id="w_phi" value="30"></label>
+                    <label>Coefficient μ: <input type="number" id="w_mu" value="0.5" step="0.1"></label>
+                    <label>Bearing Capacity (kN/m²): <input type="number" id="w_bear" value="150"></label>
+                    <label>f_cu (N/mm²): <input type="number" id="w_fcu" value="35"></label>
+                    <label>f_y (N/mm²): <input type="number" id="w_fy" value="500"></label>
+                </div>
+                <button class="action-btn" onclick="solveRCWall()">Calculate Wall</button>
+                <div id="w_output" class="report-box"></div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script src="bs8110_full.js"></script>
+</body>
+</html>

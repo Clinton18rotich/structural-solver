@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ BS 5950 Steel Design Suite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>⚙️ BS 5950: Structural Steelwork</h1>
+        <p>Beams • Stanchions • Columns • Connections • Tension • Plate Girders</p>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <button class="tab-btn active" onclick="switchTab('beam', event)">📐 Steel Beam</button>
+            <button class="tab-btn" onclick="switchTab('stanchion', event)">🏗️ Stanchion Base</button>
+            <button class="tab-btn" onclick="switchTab('column', event)">🏛️ Steel Column</button>
+            <button class="tab-btn" onclick="switchTab('connection', event)">🔩 Bolted Connection</button>
+            <button class="tab-btn" onclick="switchTab('tension', event)">⛓️ Tension Member</button>
+            <button class="tab-btn" onclick="switchTab('plate', event)">📊 Plate Girder</button>
+        </div>
+        <div class="content">
+            <!-- Steel Beam -->
+            <div id="beam-tab" class="tab-content active">
+                <h2>📐 Steel Beam Design (BS 5950-1:2000)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="sb_span" value="10" step="0.1"></label>
+                    <label>Dead Load (kN/m): <input type="number" id="sb_gk" value="5" step="0.1"></label>
+                    <label>Imposed Load (kN/m): <input type="number" id="sb_qk" value="15" step="0.1"></label>
+                    <label>Steel Grade: <select id="sb_grade"><option value="275">S275</option><option value="355" selected>S355</option><option value="460">S460</option></select></label>
+                    <label>Restraint: <select id="sb_rest"><option value="yes">Fully Restrained</option><option value="no">Unrestrained (LTB)</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveSteelBeam()">Calculate Beam</button>
+                <div id="sb_output" class="report-box"></div>
+            </div>
+            <!-- Stanchion Base Plate -->
+            <div id="stanchion-tab" class="tab-content">
+                <h2>🏗️ Stanchion Base Plate Design (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Axial Load N (kN): <input type="number" id="st_N" value="1200"></label>
+                    <label>Moment M (kNm): <input type="number" id="st_M" value="50" step="0.1"></label>
+                    <label>Column Section: <select id="st_sec"><option value="203x203x52">203×203×52 UC</option><option value="305x305x118">305×305×118 UC</option><option value="152x152x30">152×152×30 UC</option></select></label>
+                    <label>Concrete Grade: <select id="st_fcu"><option value="30">C30</option><option value="40" selected>C40</option><option value="50">C50</option></select></label>
+                    <label>Steel Grade: <select id="st_grade"><option value="275" selected>S275</option><option value="355">S355</option></select></label>
+                    <label>Bearing Width Bp (mm): <input type="number" id="st_Bp" value="400"></label>
+                    <label>Bearing Depth Dp (mm): <input type="number" id="st_Dp" value="400"></label>
+                </div>
+                <button class="action-btn" onclick="solveStanchion()">Design Base Plate</button>
+                <div id="st_output" class="report-box"></div>
+            </div>
+            <!-- Steel Column -->
+            <div id="column-tab" class="tab-content">
+                <h2>🏛️ Steel Column Design (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Axial Load N (kN): <input type="number" id="sc_N" value="800"></label>
+                    <label>Moment M (kNm): <input type="number" id="sc_M" value="30"></label>
+                    <label>Length L (m): <input type="number" id="sc_L" value="4"></label>
+                    <label>End Conditions: <select id="sc_k"><option value="1.0">Pinned-Pinned (1.0)</option><option value="0.7">Fixed-Pinned (0.7)</option><option value="0.5">Fixed-Fixed (0.5)</option><option value="2.0">Cantilever (2.0)</option></select></label>
+                    <label>Steel Grade: <select id="sc_grade"><option value="275">S275</option><option value="355" selected>S355</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveSteelColumn()">Calculate Column</button>
+                <div id="sc_output" class="report-box"></div>
+            </div>
+            <!-- Bolted Connection -->
+            <div id="connection-tab" class="tab-content">
+                <h2>🔩 Bolted Connection Design</h2>
+                <div class="input-grid">
+                    <label>Shear Force V (kN): <input type="number" id="conn_V" value="200"></label>
+                    <label>Bolt Diameter (mm): <input type="number" id="conn_d" value="20"></label>
+                    <label>Bolt Grade: <select id="conn_g"><option value="8.8" selected>Grade 8.8</option><option value="4.6">Grade 4.6</option><option value="10.9">Grade 10.9</option></select></label>
+                    <label>Plate Thickness (mm): <input type="number" id="conn_t" value="10"></label>
+                    <label>Number of Bolts: <input type="number" id="conn_n" value="4"></label>
+                    <label>Plate Grade: <select id="conn_py"><option value="275" selected>S275</option><option value="355">S355</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveConnection()">Calculate Connection</button>
+                <div id="conn_output" class="report-box"></div>
+            </div>
+            <!-- Tension Member -->
+            <div id="tension-tab" class="tab-content">
+                <h2>⛓️ Tension Member Design (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Tension Force T (kN): <input type="number" id="ten_T" value="500"></label>
+                    <label>Member Type: <select id="ten_type"><option value="angle">Angle</option><option value="channel">Channel</option><option value="flat">Flat Bar</option></select></label>
+                    <label>Steel Grade: <select id="ten_grade"><option value="275" selected>S275</option><option value="355">S355</option></select></label>
+                    <label>Connection: <select id="ten_conn"><option value="bolted">Bolted</option><option value="welded">Welded</option></select></label>
+                </div>
+                <button class="action-btn" onclick="solveTension()">Calculate Tension Member</button>
+                <div id="ten_output" class="report-box"></div>
+            </div>
+            <!-- Plate Girder -->
+            <div id="plate-tab" class="tab-content">
+                <h2>📊 Plate Girder Design (BS 5950)</h2>
+                <div class="input-grid">
+                    <label>Span (m): <input type="number" id="pg_span" value="20" step="0.1"></label>
+                    <label>UDL (kN/m): <input type="number" id="pg_udl" value="50" step="0.1"></label>
+                    <label>Steel Grade: <select id="pg_grade"><option value="275">S275</option><option value="355" selected>S355</option></select></label>
+                    <label>Web Depth hw (mm): <input type="number" id="pg_hw" value="1500"></label>
+                    <label>Web Thickness tw (mm): <input type="number" id="pg_tw" value="10"></label>
+                    <label>Flange Width bf (mm): <input type="number" id="pg_bf" value="400"></label>
+                    <label>Flange Thickness tf (mm): <input type="number" id="pg_tf" value="25"></label>
+                </div>
+                <button class="action-btn" onclick="solvePlateGirder()">Calculate Plate Girder</button>
+                <div id="pg_output" class="report-box"></div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script src="bs5950_full.js"></script>
+</body>
+</html>
