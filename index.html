@@ -10,6 +10,7 @@
     <header><h1>Full Structural Suite</h1><p>Analysis • Mechanics • BS 8110 & BS 5950 | 100% of Notes</p></header>
     <div class="container">
         <div class="sidebar">
+<button class="tab-btn" onclick="switchTab('appendix')">📜 Appendix A</button>
             <button class="tab-btn active" onclick="switchTab('analysis')">📊 Structural Analysis</button>
             <button class="tab-btn" onclick="switchTab('loaddown')">📐 Load Take-Down</button>
             <button class="tab-btn" onclick="switchTab('superposition')">⚖️ Superposition Solver</button>
@@ -28,6 +29,7 @@
             <button class="tab-btn" onclick="switchTab('composite')">🏗️ Composite Beam</button>
         </div>
         <div class="content">
+<div id="appendix-tab" class="tab-content"></div>
             <div id="analysis-tab" class="tab-content active"></div>
             <div id="loaddown-tab" class="tab-content"></div>
             <div id="superposition-tab" class="tab-content"></div>
