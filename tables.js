@@ -1,9 +1,119 @@
-function get_vc(As,b,d,fcu){let rho=100*As/(b*d);let vc_base=0.79*Math.pow(rho,1/3)*Math.pow(fcu/25,1/3);let vc=vc_base*Math.pow(400/d,0.25);return Math.min(Math.max(vc,0.4),4.0)}
-function get_beta_sx(ratio){if(ratio<=1.0)return 0.024;if(ratio<=1.2)return 0.032;if(ratio<=1.4)return 0.040;if(ratio<=1.6)return 0.048;return 0.055}
-function get_beta_sy(ratio){if(ratio<=1.0)return 0.024;if(ratio<=1.2)return 0.024;if(ratio<=1.4)return 0.024;return 0.024}
-function get_v_factor(lambda_x){if(lambda_x<=15)return 1.0;if(lambda_x<=30)return 1.0-(lambda_x-15)/15*0.1;if(lambda_x<=50)return 0.9-(lambda_x-30)/20*0.2;return 0.7-(lambda_x-50)/20*0.2}
-function get_bending_strength(lambdaLT,py){let pb;if(py===275){if(lambdaLT<=30)pb=275;else if(lambdaLT<=40)pb=275-(275-238)/10*(lambdaLT-30);else if(lambdaLT<=60)pb=238-(238-181)/20*(lambdaLT-40);else if(lambdaLT<=80)pb=181-(181-132)/20*(lambdaLT-60);else if(lambdaLT<=100)pb=132-(132-95)/20*(lambdaLT-80);else pb=95-(95-70)/20*(lambdaLT-100)}else if(py===355){if(lambdaLT<=30)pb=355;else if(lambdaLT<=40)pb=355-(355-315)/10*(lambdaLT-30);else if(lambdaLT<=60)pb=315-(315-240)/20*(lambdaLT-40);else if(lambdaLT<=80)pb=240-(240-175)/20*(lambdaLT-60);else if(lambdaLT<=100)pb=175-(175-125)/20*(lambdaLT-80);else pb=125-(125-95)/20*(lambdaLT-100)}else if(py===460){if(lambdaLT<=30)pb=460;else if(lambdaLT<=40)pb=460-(460-410)/10*(lambdaLT-30);else if(lambdaLT<=60)pb=410-(410-315)/20*(lambdaLT-40);else if(lambdaLT<=80)pb=315-(315-230)/20*(lambdaLT-60);else if(lambdaLT<=100)pb=230-(230-170)/20*(lambdaLT-80);else pb=170-(170-125)/20*(lambdaLT-100)}else{pb=py}return Math.max(pb,50)}
-function get_pc(lambda,py){let pc;if(py===275){if(lambda<=15)pc=275;else if(lambda<=30)pc=275-(275-245)/15*(lambda-15);else if(lambda<=50)pc=245-(245-190)/20*(lambda-30);else if(lambda<=70)pc=190-(190-140)/20*(lambda-50);else pc=140-(140-90)/20*(lambda-70)}else{if(lambda<=15)pc=355;else if(lambda<=30)pc=355-(355-315)/15*(lambda-15);else if(lambda<=50)pc=315-(315-250)/20*(lambda-30);else if(lambda<=70)pc=250-(250-180)/20*(lambda-50);else pc=180-(180-110)/20*(lambda-70)}return Math.max(pc,50)}
-function get_bolt_strengths(grade,d){let ps=grade==='8.8'?375:160;let pbs=460;return{ps,pbs,As:Math.PI*d*d/4}}
-const UBs={"610x229x101":{D:602.6,B:227.6,t:10.5,T:14.8,Sx:2880,Zx:2510,ry:5.01,u:0.863,x:41.9},"610x229x113":{D:607.6,B:228.2,t:11.1,T:15.6,Sx:3230,Zx:2810,ry:5.02,u:0.862,x:43.6},"533x210x92":{D:533.1,B:209.3,t:10.1,T:15.6,Sx:2370,Zx:2070,ry:4.72,u:0.870,x:37.9},"533x210x109":{D:539.5,B:210.8,t:11.6,T:17.6,Sx:2830,Zx:2460,ry:4.74,u:0.866,x:39.7},"457x191x67":{D:453.4,B:189.9,t:8.5,T:12.7,Sx:1500,Zx:1300,ry:4.17,u:0.885,x:35.1},"457x191x89":{D:463.4,B:191.9,t:10.5,T:15.4,Sx:2020,Zx:1740,ry:4.20,u:0.878,x:36.7},"406x178x60":{D:406.6,B:177.9,t:7.9,T:12.8,Sx:1190,Zx:1060,ry:3.95,u:0.888,x:36.1},"406x178x74":{D:412.8,B:179.5,t:9.5,T:16.0,Sx:1500,Zx:1330,ry:3.97,u:0.881,x:37.9},"356x171x51":{D:355.6,B:171.5,t:7.4,T:11.5,Sx:995,Zx:895,ry:3.85,u:0.885,x:35.3},"356x171x67":{D:363.4,B:173.2,t:9.1,T:15.0,Sx:1330,Zx:1190,ry:3.88,u:0.878,x:37.5},"305x165x40":{D:303.8,B:165.0,t:6.0,T:10.2,Sx:723,Zx:655,ry:3.37,u:0.886,x:32.7},"305x165x54":{D:310.4,B:166.9,t:7.9,T:13.7,Sx:1000,Zx:898,ry:3.40,u:0.880,x:34.7}};
-const UCs={"356x368x129":{A:16400,ry:9.43,Sx:2300},"356x368x153":{A:19500,ry:9.40,Sx:2730},"305x305x97":{A:12300,ry:7.79,Sx:1570},"305x305x118":{A:15000,ry:7.75,Sx:1950},"305x305x137":{A:17400,ry:7.71,Sx:2260},"254x254x73":{A:9300,ry:6.48,Sx:1020},"254x254x89":{A:11300,ry:6.44,Sx:1250},"203x203x52":{A:6650,ry:5.16,Sx:568},"203x203x71":{A:9100,ry:5.12,Sx:788},"152x152x30":{A:3830,ry:3.82,Sx:255}};
+// ---------- TABLE 3.11 (RC vc) ----------
+function get_vc(As, b, d, fcu){
+    let rho = 100 * As / (b * d);
+    let vc_base = 0.79 * Math.pow(rho, 1/3) * Math.pow(400/d, 0.25) * Math.pow(fcu/25, 1/3) / 1.25;
+    return Math.min(Math.max(vc_base, 0.4), 4.0);
+}
+// ---------- TABLE 3.24/3.25 (Two-Way Slab) ----------
+function get_beta_sx(ratio){ if(ratio <= 1.0) return 0.024; if(ratio <= 1.2) return 0.032; if(ratio <= 1.4) return 0.040; if(ratio <= 1.6) return 0.048; return 0.055; }
+function get_beta_sy(ratio){ return 0.024; }
+function get_beta_vx(ratio){ if(ratio <= 1.0) return 0.33; if(ratio <= 1.2) return 0.39; if(ratio <= 1.4) return 0.45; if(ratio <= 1.6) return 0.51; return 0.60; }
+function get_beta_vy(ratio){ return 0.33; }
+
+// ---------- TABLE 4.7 (Bending Strength pb for rolled sections, D/T based) ----------
+function get_pb_table_4_7(lambdaLT, DT, py) {
+    let base = 275; if(py === 355) base = 355;
+    if(lambdaLT <= 30) return base;
+    let pb = base - (base - 200)/30*(lambdaLT-30);
+    if(lambdaLT <= 50) pb = 200 - (200-130)/20*(lambdaLT-50);
+    if(lambdaLT <= 75) pb = 130 - (130-85)/25*(lambdaLT-75);
+    return Math.max(pb, 50);
+}
+
+// ---------- TABLE 4.8 (Slenderness factor v) ----------
+function get_v_factor(lambda_x){
+    if(lambda_x <= 15) return 1.0;
+    if(lambda_x <= 30) return 1.0 - (lambda_x-15)/15*0.1;
+    if(lambda_x <= 50) return 0.9 - (lambda_x-30)/20*0.2;
+    return 0.7 - (lambda_x-50)/20*0.2;
+}
+
+// ---------- TABLE 4.9 (Bending strength pb for LTB) ----------
+function get_bending_strength(lambdaLT, py) {
+    let pb = py;
+    if(py === 275) {
+        if(lambdaLT <= 30) pb = 275;
+        else if(lambdaLT <= 40) pb = 275 - (275-238)/10*(lambdaLT-30);
+        else if(lambdaLT <= 60) pb = 238 - (238-181)/20*(lambdaLT-40);
+        else if(lambdaLT <= 80) pb = 181 - (181-132)/20*(lambdaLT-60);
+        else if(lambdaLT <= 100) pb = 132 - (132-95)/20*(lambdaLT-80);
+        else pb = 95 - (95-70)/20*(lambdaLT-100);
+    } else if(py === 355) {
+        if(lambdaLT <= 30) pb = 355;
+        else if(lambdaLT <= 40) pb = 355 - (355-315)/10*(lambdaLT-30);
+        else if(lambdaLT <= 60) pb = 315 - (315-240)/20*(lambdaLT-40);
+        else if(lambdaLT <= 80) pb = 240 - (240-175)/20*(lambdaLT-60);
+        else if(lambdaLT <= 100) pb = 175 - (175-125)/20*(lambdaLT-80);
+        else pb = 125 - (125-95)/20*(lambdaLT-100);
+    } else {
+        if(lambdaLT <= 30) pb = py;
+        else if(lambdaLT <= 40) pb = py - (py-350)/10*(lambdaLT-30);
+        else if(lambdaLT <= 60) pb = 350 - (350-250)/20*(lambdaLT-40);
+        else if(lambdaLT <= 80) pb = 250 - (250-180)/20*(lambdaLT-60);
+        else if(lambdaLT <= 100) pb = 180 - (180-130)/20*(lambdaLT-80);
+        else pb = 130 - (130-95)/20*(lambdaLT-100);
+    }
+    return Math.max(pb, 50);
+}
+
+// ---------- TABLE 4.10 (Equivalent Uniform Moment Factor mLT) ----------
+function get_mLT(beta) {
+    if(beta >= 1.0) return 1.00;
+    if(beta >= 0.8) return 0.96 - (1-beta)/0.2*0.04;
+    if(beta >= 0.6) return 0.92 - (0.8-beta)/0.2*0.04;
+    if(beta >= 0.4) return 0.88 - (0.6-beta)/0.2*0.04;
+    if(beta >= 0.2) return 0.84 - (0.4-beta)/0.2*0.04;
+    if(beta >= 0.0) return 0.80 - (0.2-beta)/0.2*0.04;
+    if(beta >= -0.2) return 0.76 - (0-beta)/0.2*0.04;
+    if(beta >= -0.4) return 0.72 - (-0.2-beta)/0.2*0.04;
+    if(beta >= -0.6) return 0.68 - (-0.4-beta)/0.2*0.04;
+    if(beta >= -0.8) return 0.64 - (-0.6-beta)/0.2*0.04;
+    if(beta >= -1.0) return 0.60 - (-0.8-beta)/0.2*0.04;
+    return 0.60;
+}
+
+// ---------- TABLE 4.13 (Compressive strength pc for Columns) ----------
+function get_pc(lambda, py){
+    let pc = py;
+    if(py === 275) {
+        if(lambda <= 15) pc = 275;
+        else if(lambda <= 30) pc = 275 - (275-245)/15*(lambda-15);
+        else if(lambda <= 50) pc = 245 - (245-190)/20*(lambda-30);
+        else if(lambda <= 70) pc = 190 - (190-140)/20*(lambda-50);
+        else pc = 140 - (140-90)/20*(lambda-70);
+    } else if(py === 355) {
+        if(lambda <= 15) pc = 355;
+        else if(lambda <= 30) pc = 355 - (355-315)/15*(lambda-15);
+        else if(lambda <= 50) pc = 315 - (315-250)/20*(lambda-30);
+        else if(lambda <= 70) pc = 250 - (250-180)/20*(lambda-50);
+        else pc = 180 - (180-110)/20*(lambda-70);
+    }
+    return Math.max(pc, 50);
+}
+
+// ---------- TABLE 4.25 (Weld Design Strength pw) ----------
+function get_weld_strength(py, electrode){
+    let pw = 220;
+    if(electrode === 42) pw = 220;
+    if(electrode === 50) pw = 250;
+    return Math.min(pw, py * 1.0);
+}
+
+// ---------- BOLT STRENGTHS (Tables 4.19, 4.20) ----------
+function get_bolt_strengths(grade, d){
+    let ps = grade === '8.8' ? 375 : 160;
+    let pbs = 460;
+    return {ps, pbs, As: Math.PI*d*d/4};
+}
+
+// ---------- APPENDIX B STEEL DATABASE ----------
+const UBs = {
+    "610x229x101": {D:602.6,B:227.6,t:10.5,T:14.8,Sx:2880,Zx:2510,ry:5.01,u:0.863,x:41.9},
+    "406x178x60":  {D:406.6,B:177.9,t:7.9,T:12.8,Sx:1190,Zx:1060,ry:3.95,u:0.888,x:36.1},
+    "356x171x51":  {D:355.6,B:171.5,t:7.4,T:11.5,Sx:995,Zx:895,ry:3.85,u:0.885,x:35.3},
+    "305x165x40":  {D:303.8,B:165,t:6,T:10.2,Sx:723,Zx:655,ry:3.37,u:0.886,x:32.7}
+};
+const UCs = {
+    "305x305x118": {A:15000,ry:7.75,Sx:1950},
+    "203x203x52":  {A:6650,ry:5.16,Sx:568}
+};
