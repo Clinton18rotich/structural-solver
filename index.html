@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header><h1>Full Structural Suite</h1><p>Analysis • Mechanics • BS 8110 & BS 5950 | 100% of Notes</p></header>
+    <header><h1>Full Structural Suite</h1><p>Analysis • Mechanics • BS 8110 • BS 5950 • BS 5268 | 100% of Notes</p></header>
     <div class="container">
         <div class="sidebar">
-<button class="tab-btn" onclick="switchTab('appendix')">📜 Appendix A</button>
+            <button class="tab-btn" onclick="switchTab('appendix')">📜 Appendix A</button>
             <button class="tab-btn active" onclick="switchTab('analysis')">📊 Structural Analysis</button>
             <button class="tab-btn" onclick="switchTab('loaddown')">📐 Load Take-Down</button>
             <button class="tab-btn" onclick="switchTab('superposition')">⚖️ Superposition Solver</button>
@@ -27,9 +27,11 @@
             <button class="tab-btn" onclick="switchTab('steelbaseplate')">🟦 Steel Baseplate</button>
             <button class="tab-btn" onclick="switchTab('steelconn')">🔩 Steel Connection</button>
             <button class="tab-btn" onclick="switchTab('composite')">🏗️ Composite Beam</button>
+            <button class="tab-btn" onclick="switchTab('bsbeam')">🪵 Timber Beam</button>
+            <button class="tab-btn" onclick="switchTab('bscol')">🪵 Timber Column</button>
         </div>
         <div class="content">
-<div id="appendix-tab" class="tab-content"></div>
+            <div id="appendix-tab" class="tab-content"></div>
             <div id="analysis-tab" class="tab-content active"></div>
             <div id="loaddown-tab" class="tab-content"></div>
             <div id="superposition-tab" class="tab-content"></div>
@@ -46,6 +48,8 @@
             <div id="steelbaseplate-tab" class="tab-content"></div>
             <div id="steelconn-tab" class="tab-content"></div>
             <div id="composite-tab" class="tab-content"></div>
+            <div id="bsbeam-tab" class="tab-content"></div>
+            <div id="bscol-tab" class="tab-content"></div>
         </div>
     </div>
     <script src="app.js"></script>
@@ -54,5 +58,6 @@
     <script src="mechanics_engine.js"></script>
     <script src="concrete_engine.js"></script>
     <script src="steel_engine.js"></script>
+    <script src="timber_bs5268.js"></script>
 </body>
 </html>
