@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BS 8110 & BS 5950 Full Structural Suite</title>
-    <link rel="stylesheet" href="style.css?v=1786439263">
+    <title>Full Structural Suite: Analysis + BS 8110 & BS 5950</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header><h1>Full Structural Suite</h1><p>BS 8110 & BS 5950 | 100% of Notes & Tables</p></header>
+    <header><h1>Full Structural Suite</h1><p>Analysis • BS 8110 • BS 5950 | 100% of Notes</p></header>
     <div class="container">
         <div class="sidebar">
-            <button class="tab-btn active" onclick="switchTab('rcbeam')">🧱 RC Beam</button>
+            <button class="tab-btn active" onclick="switchTab('analysis')">📊 Structural Analysis</button>
+            <button class="tab-btn" onclick="switchTab('rcbeam')">🧱 RC Beam</button>
             <button class="tab-btn" onclick="switchTab('rccontbeam')">📏 RC Continuous Beam</button>
             <button class="tab-btn" onclick="switchTab('rcslab')">📐 RC Slab</button>
             <button class="tab-btn" onclick="switchTab('rctwoway')">📐 RC Two-Way Slab</button>
@@ -24,7 +25,8 @@
             <button class="tab-btn" onclick="switchTab('composite')">🏗️ Composite Beam</button>
         </div>
         <div class="content">
-            <div id="rcbeam-tab" class="tab-content active"></div>
+            <div id="analysis-tab" class="tab-content active"></div>
+            <div id="rcbeam-tab" class="tab-content"></div>
             <div id="rccontbeam-tab" class="tab-content"></div>
             <div id="rcslab-tab" class="tab-content"></div>
             <div id="rctwoway-tab" class="tab-content"></div>
@@ -38,9 +40,10 @@
             <div id="composite-tab" class="tab-content"></div>
         </div>
     </div>
-    <script src="app.js?v=1786439262"></script>
-    <script src="tables.js?v=1786439263"></script>
-    <script src="concrete_engine.js?v=1786439263"></script>
-    <script src="steel_engine.js?v=1786439263"></script>
+    <script src="app.js"></script>
+    <script src="analysis_engine.js"></script>
+    <script src="tables.js"></script>
+    <script src="concrete_engine.js"></script>
+    <script src="steel_engine.js"></script>
 </body>
 </html>
